@@ -1,0 +1,333 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		BA71D9D71ACA275400E08A38 /* USndPlugin.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = BA71D9D61ACA275400E08A38 /* USndPlugin.h */; };
+		BA71D9D91ACA275400E08A38 /* USndPlugin.mm in Sources */ = {isa = PBXBuildFile; fileRef = BA71D9D81ACA275400E08A38 /* USndPlugin.mm */; };
+		BA71D9FA1ACA284E00E08A38 /* USndExtension.mm in Sources */ = {isa = PBXBuildFile; fileRef = BA71D9F81ACA284E00E08A38 /* USndExtension.mm */; };
+		BA71D9FC1ACA29C100E08A38 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BA71D9FB1ACA29C100E08A38 /* MediaPlayer.framework */; };
+		BA71D9FE1ACA29CB00E08A38 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BA71D9FD1ACA29CB00E08A38 /* AVFoundation.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		BA71D9D11ACA275400E08A38 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+				BA71D9D71ACA275400E08A38 /* USndPlugin.h in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		BA71D9D31ACA275400E08A38 /* libUSndPlugin_tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libUSndPlugin_tvOS.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		BA71D9D61ACA275400E08A38 /* USndPlugin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = USndPlugin.h; sourceTree = "<group>"; };
+		BA71D9D81ACA275400E08A38 /* USndPlugin.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = USndPlugin.mm; sourceTree = "<group>"; };
+		BA71D9E41ACA275500E08A38 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		BA71D9F81ACA284E00E08A38 /* USndExtension.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = USndExtension.mm; sourceTree = "<group>"; };
+		BA71D9F91ACA284E00E08A38 /* USndExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = USndExtension.h; sourceTree = "<group>"; };
+		BA71D9FB1ACA29C100E08A38 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
+		BA71D9FD1ACA29CB00E08A38 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		BA71D9D01ACA275400E08A38 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BA71D9FE1ACA29CB00E08A38 /* AVFoundation.framework in Frameworks */,
+				BA71D9FC1ACA29C100E08A38 /* MediaPlayer.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		BA71D9CA1ACA275400E08A38 = {
+			isa = PBXGroup;
+			children = (
+				BA71D9FD1ACA29CB00E08A38 /* AVFoundation.framework */,
+				BA71D9FB1ACA29C100E08A38 /* MediaPlayer.framework */,
+				BA71D9D51ACA275400E08A38 /* USndPlugin */,
+				BA71D9E21ACA275400E08A38 /* USndPluginTests */,
+				BA71D9D41ACA275400E08A38 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		BA71D9D41ACA275400E08A38 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BA71D9D31ACA275400E08A38 /* libUSndPlugin_tvOS.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		BA71D9D51ACA275400E08A38 /* USndPlugin */ = {
+			isa = PBXGroup;
+			children = (
+				BA71D9D61ACA275400E08A38 /* USndPlugin.h */,
+				BA71D9D81ACA275400E08A38 /* USndPlugin.mm */,
+				BA71D9F81ACA284E00E08A38 /* USndExtension.mm */,
+				BA71D9F91ACA284E00E08A38 /* USndExtension.h */,
+			);
+			path = USndPlugin;
+			sourceTree = "<group>";
+		};
+		BA71D9E21ACA275400E08A38 /* USndPluginTests */ = {
+			isa = PBXGroup;
+			children = (
+				BA71D9E31ACA275500E08A38 /* Supporting Files */,
+			);
+			path = USndPluginTests;
+			sourceTree = "<group>";
+		};
+		BA71D9E31ACA275500E08A38 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				BA71D9E41ACA275500E08A38 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		BA71D9D21ACA275400E08A38 /* USndPlugin_tvOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BA71D9E71ACA275500E08A38 /* Build configuration list for PBXNativeTarget "USndPlugin_tvOS" */;
+			buildPhases = (
+				BA71D9CF1ACA275400E08A38 /* Sources */,
+				BA71D9D01ACA275400E08A38 /* Frameworks */,
+				BA71D9D11ACA275400E08A38 /* CopyFiles */,
+				BA4FDDE725FB03B700F89638 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = USndPlugin_tvOS;
+			productName = USndPlugin;
+			productReference = BA71D9D31ACA275400E08A38 /* libUSndPlugin_tvOS.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		BA71D9CB1ACA275400E08A38 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1240;
+				ORGANIZATIONNAME = "suwa yukiko";
+				TargetAttributes = {
+					BA71D9D21ACA275400E08A38 = {
+						CreatedOnToolsVersion = 6.1.1;
+					};
+				};
+			};
+			buildConfigurationList = BA71D9CE1ACA275400E08A38 /* Build configuration list for PBXProject "USndPlugin_tvOS" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = BA71D9CA1ACA275400E08A38;
+			productRefGroup = BA71D9D41ACA275400E08A38 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				BA71D9D21ACA275400E08A38 /* USndPlugin_tvOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		BA4FDDE725FB03B700F89638 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n#make directory\nmkdir -p \"./lib\"\nmkdir -p \"./lib/${CONFIGURATION}\"\n\n\n#remove\nrm -rf ./lib/${CONFIGURATION}/libusnd_tvos.a\n\n#combine lib file for various platforms into one\n#lipo -create \"build/${CONFIGURATION}-iphoneos/libdnsound.a\" \\\n#\"build/${CONFIGURATION}-iphonesimulator/libdnsound.a\" \\\n\n# have the same architectures (arm64) and can't be in the same fat output file ということなので統合不要\n#lipo -create \"DerivedData/USndPlugin_tvOS/Build/Products/${CONFIGURATION}-appletvos/libUSndPlugin_tvOS.a\" \\\n#\"DerivedData/USndPlugin_tvOS/Build/Products/${CONFIGURATION}-appletvsimulator/libUSndPlugin_tvOS.a\" \\\n#-output \"lib/${CONFIGURATION}/libusnd.a\"\n\n\ncp \"DerivedData/USndPlugin_tvOS/Build/Products/${CONFIGURATION}-appletvos/libUSndPlugin_tvOS.a\"\\\n \"lib/${CONFIGURATION}/libusnd_tvos.a\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		BA71D9CF1ACA275400E08A38 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BA71D9D91ACA275400E08A38 /* USndPlugin.mm in Sources */,
+				BA71D9FA1ACA284E00E08A38 /* USndExtension.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		BA71D9E51ACA275500E08A38 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = appletvos;
+				TVOS_DEPLOYMENT_TARGET = 9.0;
+			};
+			name = Debug;
+		};
+		BA71D9E61ACA275500E08A38 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = appletvos;
+				TVOS_DEPLOYMENT_TARGET = 9.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		BA71D9E81ACA275500E08A38 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ENABLE_BITCODE = YES;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		BA71D9E91ACA275500E08A38 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ENABLE_BITCODE = YES;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		BA71D9CE1ACA275400E08A38 /* Build configuration list for PBXProject "USndPlugin_tvOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BA71D9E51ACA275500E08A38 /* Debug */,
+				BA71D9E61ACA275500E08A38 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BA71D9E71ACA275500E08A38 /* Build configuration list for PBXNativeTarget "USndPlugin_tvOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BA71D9E81ACA275500E08A38 /* Debug */,
+				BA71D9E91ACA275500E08A38 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = BA71D9CB1ACA275400E08A38 /* Project object */;
+}
