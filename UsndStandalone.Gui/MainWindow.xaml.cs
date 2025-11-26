@@ -520,33 +520,101 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
             return;
         }
 
-        var fileCandidates = new List<string>
+        var fileName = SelectedLabel.FileName ?? string.Empty;
+        
+        // 拡張子がない場合は .wav を追加したバージョンも用意
+        var fileNameWithExt = fileName;
+        if (!string.IsNullOrEmpty(fileName) && !Path.HasExtension(fileName))
         {
-            Path.Combine(_baseDir, SelectedLabel.FileName ?? string.Empty),
-            Path.Combine(_baseDir, "Audio", SelectedLabel.FileName ?? string.Empty),
-            Path.GetFullPath(Path.Combine(_xmlDir, "..", "Audio", SelectedLabel.FileName ?? string.Empty))
+            fileNameWithExt = fileName + ".wav";
+        }
+
+        var fileCandidates = new List<string>();
+        
+        // 各検索パスに対して、元のファイル名と拡張子付きの両方を試す
+        var searchPaths = new[]
+        {
+            _baseDir,
+            Path.Combine(_baseDir, "Audio"),
+            Path.GetFullPath(Path.Combine(_xmlDir, "..", "Audio"))
         };
+
+        foreach (var searchPath in searchPaths)
+        {
+            fileCandidates.Add(Path.Combine(searchPath, fileName));
+            if (fileName != fileNameWithExt)
+            {
+                fileCandidates.Add(Path.Combine(searchPath, fileNameWithExt));
+            }
+        }
 
         // 各Label Groupフォルダー内も検索
         foreach (var group in _labelGroups)
         {
-            fileCandidates.Add(Path.Combine(_baseDir, "Audio", group.GroupName, SelectedLabel.FileName ?? string.Empty));
+            var groupPath = Path.Combine(_baseDir, "Audio", group.GroupName);
+            fileCandidates.Add(Path.Combine(groupPath, fileName));
+            if (fileName != fileNameWithExt)
+            {
+                fileCandidates.Add(Path.Combine(groupPath, fileNameWithExt));
+            }
         }
 
         var path = fileCandidates.FirstOrDefault(File.Exists);
         if (path == null)
         {
-            UpdateStatus($"音声ファイルが見つかりません: {SelectedLabel.FileName}");
+            UpdateStatus($"音声ファイルが見つかりません: {fileName} (または {fileNameWithExt})");
             return;
         }
 
-        LoadWaveform(path);
-        _player.Play(path, SelectedLabel.LoopBool);
-        UpdateStatus($"再生中: {SelectedLabel.LabelName} ({path})");
+        try
+        {
+            LoadWaveform(path);
+            
+            // USndパラメータを取得して適用
+            float volume = ParseFloat(SelectedLabel.Volume, 1.0f);
+            float pan = ParseFloat(SelectedLabel.Pan, 0f);
+            int pitch = ParseInt(SelectedLabel.Pitch, 0);
+            float delay = ParseFloat(SelectedLabel.Delay, 0f);
+            float fadeInTime = ParseFloat(SelectedLabel.FadeInTime, 0f);
+            
+            _player.PlayWithParameters(path, SelectedLabel.LoopBool, volume, pan, pitch, delay, fadeInTime);
+            
+            // ステータス表示にパラメータ情報を追加
+            var paramInfo = new List<string>();
+            if (volume != 1.0f) paramInfo.Add($"Vol:{volume:F2}");
+            if (pan != 0f) paramInfo.Add($"Pan:{pan:F2}");
+            if (pitch != 0) paramInfo.Add($"Pitch:{pitch}cent");
+            if (delay > 0f) paramInfo.Add($"Delay:{delay:F2}s");
+            if (fadeInTime > 0f) paramInfo.Add($"FadeIn:{fadeInTime:F2}s");
+            
+            var paramStr = paramInfo.Count > 0 ? $" [{string.Join(", ", paramInfo)}]" : "";
+            UpdateStatus($"再生中: {SelectedLabel.LabelName} ({path}){paramStr}");
+        }
+        catch (Exception ex)
+        {
+            UpdateStatus($"再生エラー: {ex.Message}");
+            System.Windows.MessageBox.Show(
+                $"音声の再生に失敗しました。\n\nエラー: {ex.Message}\n\nファイル: {path}",
+                "再生エラー",
+                System.Windows.MessageBoxButton.OK,
+                System.Windows.MessageBoxImage.Error);
+        }
     }
 
     private void StopAudio()
     {
+        // FadeOutTime があればフェードアウト付き停止
+        if (SelectedLabel != null)
+        {
+            float fadeOutTime = ParseFloat(SelectedLabel.FadeOutTime, 0f);
+            if (fadeOutTime > 0)
+            {
+                _player.StopWithFade(fadeOutTime);
+                UpdateStatus($"フェードアウト停止中 ({fadeOutTime:F2}s)...");
+                return;
+            }
+        }
+        
         _player.Stop();
         UpdateStatus("再生を停止しました。");
     }
@@ -1890,6 +1958,36 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
     public void Dispose()
     {
         _player.Dispose();
+    }
+
+    // --- Helper Methods ---
+    
+    /// <summary>
+    /// 文字列をfloatに変換（失敗時はデフォルト値）
+    /// </summary>
+    private static float ParseFloat(string? value, float defaultValue)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return defaultValue;
+        
+        if (float.TryParse(value, out float result))
+            return result;
+        
+        return defaultValue;
+    }
+    
+    /// <summary>
+    /// 文字列をintに変換（失敗時はデフォルト値）
+    /// </summary>
+    private static int ParseInt(string? value, int defaultValue)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return defaultValue;
+        
+        if (int.TryParse(value, out int result))
+            return result;
+        
+        return defaultValue;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

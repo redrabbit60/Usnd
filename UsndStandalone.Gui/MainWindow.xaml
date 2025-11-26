@@ -359,7 +359,7 @@
                                         Margin="0,0,0,8">
                                     <StackPanel>
                                         <TextBlock Text="Volume (0.0 - 1.0)" Foreground="#b6c0d8" Margin="0,0,0,4"/>
-                                        <TextBox Text="{Binding SelectedMaster.Volume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                        <TextBox Text="{Binding SelectedMaster.Volume, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                                  Width="120"/>
                                     </StackPanel>
                                 </Border>
@@ -384,7 +384,7 @@
                                         Margin="0,0,0,8">
                                     <StackPanel>
                                         <TextBlock Text="Volume (0.0 - 1.0)" Foreground="#b6c0d8" Margin="0,0,0,4"/>
-                                        <TextBox Text="{Binding SelectedCategory.Volume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                        <TextBox Text="{Binding SelectedCategory.Volume, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                                  Width="120"/>
                                     </StackPanel>
                                 </Border>
@@ -441,7 +441,7 @@
                                     Margin="0,0,0,8">
                                 <StackPanel>
                                     <TextBlock Text="Volume (0.0 - 1.0)" Foreground="#b6c0d8" Margin="0,0,0,4"/>
-                                    <TextBox Text="{Binding SelectedLabel.Volume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                    <TextBox Text="{Binding SelectedLabel.Volume, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                              Width="120"/>
                                 </StackPanel>
                             </Border>
