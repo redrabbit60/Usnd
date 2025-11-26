@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\UsndStandalone\Models.cs" Link="Shared\Models.cs" />
+    <Compile Include="..\UsndStandalone\XmlStore.cs" Link="Shared\XmlStore.cs" />
+    <Compile Include="..\UsndStandalone\AudioPlayer.cs" Link="Shared\AudioPlayer.cs" />
+    <Compile Include="..\UsndStandalone\BinaryStore.cs" Link="Shared\BinaryStore.cs" />
+    <Compile Include="..\UsndStandalone\AppSettings.cs" Link="Shared\AppSettings.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NAudio" Version="2.2.1" />
+  </ItemGroup>
+
+</Project>
+
+
+

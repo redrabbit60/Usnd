@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MasterSettings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<MasterSet>
+		<MasterName>BGM</MasterName>
+		<Volume>1</Volume>
+	</MasterSet>
+	<MasterSet>
+		<MasterName>SE</MasterName>
+		<Volume>1</Volume>
+	</MasterSet>
+</MasterSettings>

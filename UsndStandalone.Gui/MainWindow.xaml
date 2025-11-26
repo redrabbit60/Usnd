@@ -1,0 +1,1046 @@
+<Window x:Class="UsndStandalone.Gui.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="SkySound for USnd By Chang"
+        Height="640"
+        Width="1180"
+        Background="#101822">
+    <Window.InputBindings>
+        <KeyBinding Key="S" Modifiers="Ctrl" Command="{Binding SaveFileCommand}"/>
+        <KeyBinding Key="Space" Command="{Binding TogglePlayCommand}"/>
+    </Window.InputBindings>
+    
+    <Window.Resources>
+        <LinearGradientBrush x:Key="HeroGradient" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#334d88" Offset="0"/>
+            <GradientStop Color="#1d2333" Offset="1"/>
+        </LinearGradientBrush>
+
+        <Style x:Key="CardBorderStyle" TargetType="Border">
+            <Setter Property="Background" Value="#1c2533"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="12"/>
+            <Setter Property="Margin" Value="0,8,0,8"/>
+        </Style>
+    </Window.Resources>
+
+    <DockPanel Margin="16">
+        <!-- File Manager Bar -->
+        <Border DockPanel.Dock="Top"
+                Height="50"
+                CornerRadius="12"
+                Margin="0,0,0,12"
+                Background="#1c2533"
+                Padding="16,8">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <TextBlock Text="現在のファイル："
+                           Grid.Column="0"
+                           VerticalAlignment="Center"
+                           Foreground="#b6c0d8"
+                           FontSize="14"
+                           Margin="0,0,8,0"/>
+                
+                <ComboBox Grid.Column="1"
+                          ItemsSource="{Binding SaveFileList}"
+                          SelectedItem="{Binding CurrentSaveFileName, Mode=TwoWay}"
+                          Height="28"
+                          MinWidth="200"
+                          MaxWidth="400"
+                          VerticalAlignment="Center"/>
+                
+                <StackPanel Grid.Column="2"
+                            Orientation="Horizontal"
+                            Margin="12,0,0,0">
+                    <Button Content="新規"
+                            Width="60"
+                            Height="28"
+                            Margin="0,0,8,0"
+                            Command="{Binding NewFileCommand}"/>
+                    <Button Content="保存"
+                            Width="60"
+                            Height="28"
+                            Margin="0,0,8,0"
+                            Command="{Binding SaveFileCommand}"/>
+                    <Button Content="削除"
+                            Width="60"
+                            Height="28"
+                            Command="{Binding DeleteFileCommand}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+        
+        <!-- Hero -->
+        <Border DockPanel.Dock="Top"
+                Height="140"
+                CornerRadius="18"
+                Margin="0,0,0,16"
+                Background="{StaticResource HeroGradient}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Border Width="180"
+                        Height="120"
+                        Margin="20"
+                        CornerRadius="16"
+                        Background="#66FFFFFF">
+                    <Viewbox Stretch="Uniform">
+                        <TextBlock Text="SkySound"
+                                   FontSize="48"
+                                   FontWeight="Bold"
+                                   Foreground="#1a2130"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"/>
+                    </Viewbox>
+                </Border>
+
+                <StackPanel Grid.Column="1"
+                            Margin="12"
+                            VerticalAlignment="Center">
+                    <TextBlock Text="SkySound for USnd By Chang"
+                               FontSize="28"
+                               FontWeight="Semibold"
+                               Foreground="White"/>
+                    <TextBlock Text="問い合わせ Chang_Hoyeun/kag"
+                               FontSize="14"
+                               Foreground="#d0d8f0"
+                               Margin="0,6,0,0"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Body -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <!-- 左: Label/Category/Master -->
+                <ColumnDefinition Width="340"/>
+                <ColumnDefinition Width="20"/>
+                <!-- 中央: ラベル詳細 -->
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="20"/>
+                <!-- 右: コントロール -->
+                <ColumnDefinition Width="260"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- 左: Browser（上下分離） -->
+            <Border Grid.Column="0"
+                    Style="{StaticResource CardBorderStyle}">
+                <DockPanel>
+                    <TextBlock Text="Browser"
+                               DockPanel.Dock="Top"
+                               FontSize="18"
+                               FontWeight="Bold"
+                               Foreground="#f5f6ff"
+                               Margin="0,0,0,12"/>
+                    
+                    <!-- 上部: Master/Category (固定) -->
+                    <Border DockPanel.Dock="Top"
+                            Background="#15202b"
+                            CornerRadius="8"
+                            Padding="8"
+                            Margin="0,0,0,12">
+                        <DockPanel>
+                            <TextBlock Text="Settings"
+                                       DockPanel.Dock="Top"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       Foreground="#b6c0d8"
+                                       Margin="0,0,0,6"/>
+                            <TabControl x:Name="SettingsTabControl"
+                                        SelectedIndex="{Binding SelectedSettingsTabIndex, Mode=TwoWay}"
+                                        SelectionChanged="SettingsTabControl_SelectionChanged"
+                                        Height="180">
+                        <!-- Master -->
+                        <TabItem Header="Master">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                        <TextBlock Text="Master List"
+                                                   FontSize="14"
+                                                   Foreground="#f5f6ff"
+                                                   VerticalAlignment="Center"/>
+                                        <Button Content="+"
+                                                Width="28"
+                                                Height="28"
+                                                Margin="12,0,4,0"
+                                                Command="{Binding AddMasterCommand}"
+                                                FontSize="16"
+                                                FontWeight="Bold"
+                                                Padding="0"
+                                                VerticalAlignment="Center"/>
+                                        <Button Content="-"
+                                                Width="28"
+                                                Height="28"
+                                                Command="{Binding RemoveMasterCommand}"
+                                                FontSize="16"
+                                                FontWeight="Bold"
+                                                Padding="0"
+                                                VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <ListView ItemsSource="{Binding MasterItems}"
+                                              SelectedItem="{Binding SelectedMaster, Mode=TwoWay}"
+                                              Background="Transparent"
+                                              BorderThickness="0"
+                                              Foreground="White">
+                                        <ListView.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Background="#232f41"
+                                                        CornerRadius="8"
+                                                        Margin="0,4,0,0"
+                                                        Padding="8">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBox Text="{Binding MasterName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                 Width="140"
+                                                                 Margin="0,0,12,0"
+                                                                 VerticalAlignment="Center"/>
+                                                        <TextBlock Text="Volume:" 
+                                                                   Foreground="#b6c0d8"
+                                                                   VerticalAlignment="Center"
+                                                                   Margin="0,0,4,0"/>
+                                                        <TextBox Text="{Binding Volume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                 Width="80"
+                                                                 VerticalAlignment="Center"/>
+                                                    </StackPanel>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ListView.ItemTemplate>
+                                    </ListView>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </TabItem>
+
+                        <!-- Category -->
+                        <TabItem Header="Category">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                        <TextBlock Text="Category List"
+                                                   FontSize="14"
+                                                   Foreground="#f5f6ff"
+                                                   VerticalAlignment="Center"/>
+                                        <Button Content="+"
+                                                Width="28"
+                                                Height="28"
+                                                Margin="12,0,4,0"
+                                                Command="{Binding AddCategoryCommand}"
+                                                FontSize="16"
+                                                FontWeight="Bold"
+                                                Padding="0"
+                                                VerticalAlignment="Center"/>
+                                        <Button Content="-"
+                                                Width="28"
+                                                Height="28"
+                                                Command="{Binding RemoveCategoryCommand}"
+                                                FontSize="16"
+                                                FontWeight="Bold"
+                                                Padding="0"
+                                                VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <ListView ItemsSource="{Binding CategoryItems}"
+                                              SelectedItem="{Binding SelectedCategory, Mode=TwoWay}"
+                                              Background="Transparent"
+                                              BorderThickness="0"
+                                              Foreground="White">
+                                        <ListView.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Background="#232f41"
+                                                        CornerRadius="8"
+                                                        Margin="0,4,0,0"
+                                                        Padding="6">
+                                                    <StackPanel>
+                                                        <TextBlock Text="{Binding CategoryName}"
+                                                                   FontWeight="SemiBold"/>
+                                                        <StackPanel Orientation="Horizontal"
+                                                                    Margin="0,4,0,0">
+                                                            <TextBlock Text="Vol:" Foreground="#b6c0d8"/>
+                                                            <TextBox Text="{Binding Volume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                     Width="60"
+                                                                     Margin="4,0,8,0"/>
+                                                            <TextBlock Text="Max:" Foreground="#b6c0d8"/>
+                                                            <TextBox Text="{Binding MaxNum, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                     Width="40"
+                                                                     Margin="4,0,8,0"/>
+                                                            <TextBlock Text="Master:" Foreground="#b6c0d8"/>
+                                                            <TextBox Text="{Binding MasterName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                     Width="80"
+                                                                     Margin="4,0,0,0"/>
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ListView.ItemTemplate>
+                                    </ListView>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </TabItem>
+                    </TabControl>
+                        </DockPanel>
+                    </Border>
+                    
+                    <!-- 下部: Label Groups (動的) -->
+                    <DockPanel>
+                        <StackPanel DockPanel.Dock="Top" 
+                                    Orientation="Horizontal" 
+                                    Margin="0,0,0,8">
+                            <TextBlock Text="Label Groups"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       Foreground="#b6c0d8"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,12,0"/>
+                            <Button Content="+"
+                                    Width="24"
+                                    Height="24"
+                                    Margin="0,0,4,0"
+                                    Command="{Binding AddLabelGroupCommand}"
+                                    FontSize="14"
+                                    FontWeight="Bold"
+                                    Padding="0"/>
+                            <Button Content="-"
+                                    Width="24"
+                                    Height="24"
+                                    Command="{Binding RemoveLabelGroupCommand}"
+                                    FontSize="14"
+                                    FontWeight="Bold"
+                                    Padding="0"/>
+                        </StackPanel>
+                        <TabControl x:Name="LabelGroupTabControl"
+                                    SelectedIndex="{Binding SelectedLabelGroupTabIndex, Mode=TwoWay}"
+                                    SelectionChanged="LabelGroupTabControl_SelectionChanged"
+                                    AllowDrop="True"
+                                    DragEnter="LabelGroupTabControl_DragEnter"
+                                    Drop="LabelGroupTabControl_Drop">
+                        </TabControl>
+                    </DockPanel>
+                </DockPanel>
+            </Border>
+
+            <!-- 中央: Detail (Master/Category/Label) -->
+            <Border Grid.Column="2"
+                    Style="{StaticResource CardBorderStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- タイトル（選択に応じて切り替え） -->
+                    <TextBlock Text="{Binding DetailPanelTitle}"
+                               FontSize="18"
+                               FontWeight="Bold"
+                               Foreground="#f5f6ff"/>
+
+                    <ScrollViewer Grid.Row="1"
+                                  VerticalScrollBarVisibility="Auto">
+                        <StackPanel>
+                            <!-- Master Detail -->
+                            <StackPanel Margin="0,12,0,0"
+                                        Visibility="{Binding MasterDetailVisibility}">
+                                <Border BorderBrush="#3a4a5f"
+                                        BorderThickness="0,0,0,1"
+                                        Padding="0,0,0,8"
+                                        Margin="0,0,0,8">
+                                    <StackPanel>
+                                        <TextBlock Text="MasterName" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                        <TextBox Text="{Binding SelectedMaster.MasterName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                 Width="280"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border BorderBrush="#3a4a5f"
+                                        BorderThickness="0,0,0,1"
+                                        Padding="0,0,0,8"
+                                        Margin="0,0,0,8">
+                                    <StackPanel>
+                                        <TextBlock Text="Volume (0.0 - 1.0)" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                        <TextBox Text="{Binding SelectedMaster.Volume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                 Width="120"/>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+
+                            <!-- Category Detail -->
+                            <StackPanel Margin="0,12,0,0"
+                                        Visibility="{Binding CategoryDetailVisibility}">
+                                <Border BorderBrush="#3a4a5f"
+                                        BorderThickness="0,0,0,1"
+                                        Padding="0,0,0,8"
+                                        Margin="0,0,0,8">
+                                    <StackPanel>
+                                        <TextBlock Text="CategoryName" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                        <TextBox Text="{Binding SelectedCategory.CategoryName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                 Width="280"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border BorderBrush="#3a4a5f"
+                                        BorderThickness="0,0,0,1"
+                                        Padding="0,0,0,8"
+                                        Margin="0,0,0,8">
+                                    <StackPanel>
+                                        <TextBlock Text="Volume (0.0 - 1.0)" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                        <TextBox Text="{Binding SelectedCategory.Volume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                 Width="120"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border BorderBrush="#3a4a5f"
+                                        BorderThickness="0,0,0,1"
+                                        Padding="0,0,0,8"
+                                        Margin="0,0,0,8">
+                                    <StackPanel>
+                                        <TextBlock Text="MaxNum" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                        <TextBox Text="{Binding SelectedCategory.MaxNum, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                 Width="100"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border BorderBrush="#3a4a5f"
+                                        BorderThickness="0,0,0,1"
+                                        Padding="0,0,0,8"
+                                        Margin="0,0,0,8">
+                                    <StackPanel>
+                                        <TextBlock Text="MasterName" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                        <TextBox Text="{Binding SelectedCategory.MasterName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                 Width="200"/>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+
+                            <!-- Label Detail -->
+                            <StackPanel Margin="0,12,0,0"
+                                        Visibility="{Binding LabelDetailVisibility}">
+                            <!-- 基本情報 -->
+                            <TextBlock Text="基本情報" Foreground="#f5f6ff" FontWeight="Bold" Margin="0,0,0,8"/>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="LabelName" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.LabelName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="280"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="FileName" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.FileName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="280"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="Volume (0.0 - 1.0)" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.Volume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="120"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox Content="Loop"
+                                              Foreground="White"
+                                              IsChecked="{Binding SelectedLabelLoop, Mode=TwoWay}"/>
+                                    <CheckBox Content="IsStealOldest (label)"
+                                              Margin="20,0,0,0"
+                                              Foreground="White"
+                                              IsChecked="{Binding SelectedLabelIsStealOldest, Mode=TwoWay}"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- 発音制御 -->
+                            <TextBlock Text="発音制御" Foreground="#f5f6ff" FontWeight="Bold" Margin="0,8,0,8"/>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="CategoryBehavior" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <ComboBox ItemsSource="{Binding CategoryBehaviorOptions}"
+                                              SelectedItem="{Binding SelectedLabel.CategoryBehavior, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                              Width="200"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="Priority (0-127)" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.Priority, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="100"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="CategoryName" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.CategoryName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="200"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="SingleGroup" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.SingleGroup, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="200"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="MaxNum" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.MaxNum, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="100"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Unity設定 -->
+                            <TextBlock Text="Unity設定" Foreground="#f5f6ff" FontWeight="Bold" Margin="0,8,0,8"/>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="UnityMixerName" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.UnityMixerName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="200"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="SpatialGroup" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.SpatialGroup, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="200"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="Delay (sec)" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.Delay, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="100"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="Interval (sec)" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.Interval, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="100"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- 再生・停止時の挙動 -->
+                            <TextBlock Text="再生・停止時の挙動" Foreground="#f5f6ff" FontWeight="Bold" Margin="0,8,0,8"/>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="Pan (-1 to 1)" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.Pan, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="100"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="Pitch (-1200 to 1200)" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.Pitch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="120"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <CheckBox Content="IsLastSamples"
+                                          Foreground="White"
+                                          IsChecked="{Binding SelectedLabel.IsLastSamplesBool, Mode=TwoWay}"/>
+                            </Border>
+
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="FadeInTime" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.FadeInTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="100"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="FadeOutTime" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.FadeOutTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="100"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="FadeInOldSamples" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.FadeInOldSample, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="100"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="FadeOutOnPause" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.FadeOutOnPause, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="100"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="FadeInOffPause" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.FadeInOffPause, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="100"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- ランダム設定（Vol/Pitch） -->
+                            <TextBlock Text="ボリュームとピッチのランダム設定" Foreground="#f5f6ff" FontWeight="Bold" Margin="0,8,0,8"/>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox Content="IsVolRnd"
+                                              Foreground="White"
+                                              IsChecked="{Binding SelectedLabel.IsVolRndBool, Mode=TwoWay}"/>
+                                    <CheckBox Content="IncVol"
+                                              Margin="20,0,0,0"
+                                              Foreground="White"
+                                              IsChecked="{Binding SelectedLabel.IncVolBool, Mode=TwoWay}"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="VolRndMin" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.VolRndMin, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="100"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="VolRndMax" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.VolRndMax, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="100"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="VolRndUnit" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.VolRndUnit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="100"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox Content="IsPitchRnd"
+                                              Foreground="White"
+                                              IsChecked="{Binding SelectedLabel.IsPitchRndBool, Mode=TwoWay}"/>
+                                    <CheckBox Content="IncPitch"
+                                              Margin="20,0,0,0"
+                                              Foreground="White"
+                                              IsChecked="{Binding SelectedLabel.IncPitchBool, Mode=TwoWay}"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="PitchRndMin" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.PitchRndMin, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="120"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="PitchRndMax" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.PitchRndMax, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="120"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="PitchRndUnit" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.PitchRndUnit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="120"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- パンとソースのランダム設定 -->
+                            <TextBlock Text="パンとソースのランダム設定" Foreground="#f5f6ff" FontWeight="Bold" Margin="0,8,0,8"/>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox Content="IsPanRnd"
+                                              Foreground="White"
+                                              IsChecked="{Binding SelectedLabel.IsPanRndBool, Mode=TwoWay}"/>
+                                    <CheckBox Content="IncPan"
+                                              Margin="20,0,0,0"
+                                              Foreground="White"
+                                              IsChecked="{Binding SelectedLabel.IncPanBool, Mode=TwoWay}"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="PanRndMin" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.PanRndMin, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="100"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="PanRndMax" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.PanRndMax, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="100"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="PanRndUnit" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.PanRndUnit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="100"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox Content="IsRndSrc"
+                                              Foreground="White"
+                                              IsChecked="{Binding SelectedLabel.IsRndSrcBool, Mode=TwoWay}"/>
+                                    <CheckBox Content="IncSrc"
+                                              Margin="20,0,0,0"
+                                              Foreground="White"
+                                              IsChecked="{Binding SelectedLabel.IncSrcBool, Mode=TwoWay}"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="RndSrc" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.RndSrc, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="280"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- ピッチ・パン移動 -->
+                            <TextBlock Text="再生時にピッチ/パンを動かす設定" Foreground="#f5f6ff" FontWeight="Bold" Margin="0,8,0,8"/>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <CheckBox Content="IsMovePitch"
+                                          Foreground="White"
+                                          IsChecked="{Binding SelectedLabel.IsMovePitchBool, Mode=TwoWay}"/>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="PitchStart" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.PitchStart, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="120"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="PitchEnd" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.PitchEnd, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="120"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="PitchMoveTime" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.PitchMoveTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="100"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <CheckBox Content="IsMovePan"
+                                          Foreground="White"
+                                          IsChecked="{Binding SelectedLabel.IsMovePanBool, Mode=TwoWay}"/>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="PanStart" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.PanStart, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="100"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="PanEnd" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.PanEnd, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="100"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="PanMoveTime" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.PanMoveTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="100"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- ダッキング関連 -->
+                            <TextBlock Text="ダッキング関連" Foreground="#f5f6ff" FontWeight="Bold" Margin="0,8,0,8"/>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="DuckingCategory" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.DuckingCategory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="280"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="DuckStart" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.DuckStart, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="100"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="DuckEnd" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.DuckEnd, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="100"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="DuckVol" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.DuckVol, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="100"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <CheckBox Content="AutoRestore"
+                                          Foreground="White"
+                                          IsChecked="{Binding SelectedLabel.AutoRestoreBool, Mode=TwoWay}"/>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="RestoreTime" Foreground="#b6c0d8" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding SelectedLabel.RestoreTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Width="100"/>
+                                </StackPanel>
+                            </Border>
+                            <Border BorderBrush="#3a4a5f"
+                                    BorderThickness="0,0,0,1"
+                                    Padding="0,0,0,8"
+                                    Margin="0,0,0,8">
+                                <CheckBox Content="IsAndroidNative"
+                                          Foreground="White"
+                                          IsChecked="{Binding SelectedLabel.IsAndroidNativeBool, Mode=TwoWay}"/>
+                            </Border>
+                            </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+
+            <!-- 右: 再生とXML -->
+            <Border Grid.Column="4"
+                    Style="{StaticResource CardBorderStyle}">
+                <StackPanel>
+                    <TextBlock Text="Controls"
+                               FontSize="18"
+                               FontWeight="Bold"
+                               Foreground="#f5f6ff"
+                               Margin="0,0,0,8"/>
+
+                    <TextBlock Text="Playback Control"
+                               Foreground="#b6c0d8"
+                               Margin="0,4,0,4"/>
+                    <StackPanel Orientation="Horizontal"
+                                Margin="0,0,0,8">
+                        <Button Content="Play"
+                                Width="90"
+                                Margin="0,0,12,0"
+                                Command="{Binding PlayCommand}"/>
+                        <Button Content="Stop"
+                                Width="90"
+                                Command="{Binding StopCommand}"/>
+                    </StackPanel>
+
+                    <Separator Margin="0,8,0,8"/>
+
+                    <TextBlock Text="XML"
+                               Foreground="#b6c0d8"
+                               Margin="0,0,0,4"/>
+                    <Button Content="パス指定"
+                            Width="140"
+                            Margin="0,0,0,8"
+                            Command="{Binding SelectXmlPathCommand}"/>
+                    <Button Content="XML読み込み"
+                            Width="140"
+                            Margin="0,0,0,8"
+                            Command="{Binding ImportXmlCommand}"/>
+                    <Button Content="XML書き出し"
+                            Width="140"
+                            Command="{Binding SaveCommand}"/>
+
+                    <Separator Margin="0,8,0,8"/>
+
+                    <TextBlock Text="Waveform"
+                               Foreground="#b6c0d8"
+                               Margin="0,0,0,4"/>
+                    <Border Background="#141b26"
+                            CornerRadius="8"
+                            Height="120"
+                            Margin="0,0,0,8">
+                        <Grid>
+                            <Polyline Points="{Binding WaveformPoints}"
+                                      Stroke="#55aaff"
+                                      StrokeThickness="1.5"/>
+                        </Grid>
+                    </Border>
+
+                    <TextBlock Text="Audio Info"
+                               Foreground="#b6c0d8"
+                               Margin="0,0,0,4"/>
+                    <Border Background="#141b26"
+                            CornerRadius="8"
+                            Padding="8"
+                            Margin="0,0,0,8">
+                        <StackPanel>
+                            <TextBlock Text="{Binding AudioInfoText}"
+                                       Foreground="#8ec5ff"
+                                       FontSize="12"
+                                       TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Separator Margin="0,8,0,8"/>
+
+                    <TextBlock Text="ステータス"
+                               Foreground="#b6c0d8"
+                               Margin="0,16,0,4"/>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                  Height="160">
+                        <TextBlock Text="{Binding StatusMessage}"
+                                   Foreground="#8ec5ff"
+                                   TextWrapping="Wrap"/>
+                    </ScrollViewer>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </DockPanel>
+</Window>
+
+

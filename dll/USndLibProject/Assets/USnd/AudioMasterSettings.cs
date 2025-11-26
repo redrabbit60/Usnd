@@ -1,0 +1,80 @@
+﻿using UnityEngine;
+using System.Collections;
+
+namespace USnd
+{
+    public partial class AudioManager : MonoBehaviour
+    {
+        public class AudioMasterSettings
+        {
+
+            public string masterName;
+
+            //[Range(0, 1)]
+            public float volume = 1;        // こちらはInspector,テーブルで変更するボリュームなのでプログラムから変更しない.
+
+
+            // programVolume, duckingVolumeはAwakeで1にするので編集はできない。現在の値をInspector上で見れるようにするためpublicにしてある.
+            AudioParamUpdater volumeUpdater = new AudioParamUpdater();
+            public float programVolume = 1;        // プログラム上のボリューム係数.
+
+            public float mute = 1;
+
+            float manner = 1;
+
+
+            public AudioMasterSettings()
+            {
+                programVolume = 1;
+            }
+
+            public void CopySettings(AudioMasterSettings src)
+            {
+                if (masterName.CompareTo(src.masterName) == 0)
+                {
+                    volume = src.volume;
+                }
+            }
+
+            public float GetCurrentVolume()
+            {
+                return programVolume;
+            }
+
+            public float GetVolumeFactor()
+            {
+                return programVolume * volume * mute * manner;
+            }
+
+            public void SetVolumeUpdater(float start, float target, float time)
+            {
+                volumeUpdater.SetParam(start, target, time, false);
+            }
+
+            public void ClearVolumeUpdater()
+            {
+                volumeUpdater.Clear();
+            }
+
+            public bool UpdateVolume()
+            {
+                if (volumeUpdater.active)
+                {
+                    programVolume = volumeUpdater.Update();
+                    return true;
+                }
+                return false;
+            }
+
+            public void SetMute(bool onMute)
+            {
+                mute = (onMute) ? 0 : 1;
+            }
+
+            public void SetMannerMode(bool onMute)
+            {
+                manner = (onMute) ? 0 : 1;
+            }
+        }
+    }
+}
