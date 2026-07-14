@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2D競馬シミュレーター（実況タイミング確認用）</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+    background: #1a2332;
+    color: #e8eaed;
+    padding: 12px;
+  }
+  h1 { font-size: 16px; margin-bottom: 8px; color: #9fb4cc; font-weight: 600; }
+  #toolbar {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    background: #232f45; border-radius: 8px; padding: 10px 14px; margin-bottom: 10px;
+  }
+  button {
+    background: #3b6ea5; color: #fff; border: none; border-radius: 6px;
+    padding: 8px 18px; font-size: 14px; cursor: pointer; font-weight: 600;
+  }
+  button:hover { background: #4a80ba; }
+  button:disabled { background: #555; cursor: default; }
+  #playBtn { min-width: 110px; }
+  .speedBtn { padding: 6px 12px; background: #37415a; font-weight: normal; }
+  .speedBtn.active { background: #e0a030; color: #222; font-weight: 700; }
+  #timeDisp {
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 26px; font-weight: 700; color: #ffd76e;
+    min-width: 150px; text-align: center;
+    background: #131a28; border-radius: 6px; padding: 4px 10px;
+  }
+  #seekWrap { display: flex; align-items: center; gap: 8px; flex: 1 1 300px; min-width: 260px; }
+  #seek { flex: 1; accent-color: #e0a030; height: 20px; cursor: pointer; }
+  #raceInfo { font-size: 13px; color: #9fb4cc; }
+  #fileWrap { font-size: 12px; color: #9fb4cc; margin-bottom: 8px; }
+  #fileWrap input { font-size: 12px; }
+  #canvasWrap { position: relative; }
+  canvas {
+    display: block; width: 100%; border-radius: 8px; background: #2e7d4f;
+  }
+  #dropHint {
+    position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
+    background: rgba(20,30,50,0.8); border: 3px dashed #e0a030; border-radius: 8px;
+    font-size: 20px; color: #ffd76e; pointer-events: none;
+  }
+  #err { color: #ff8080; font-size: 13px; margin-top: 6px; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<h1>2D競馬シミュレーター（実況音声タイミング確認用）</h1>
+
+<div id="fileWrap">
+  レースデータ(JSON)：
+  <input type="file" id="fileInput" accept=".json,application/json">
+  <span>（未選択の場合は同梱サンプルデータで動作します。JSONファイルを画面へドラッグ＆ドロップでも読込可）</span>
+</div>
+
+<div id="toolbar">
+  <button id="playBtn">▶ 再生</button>
+  <button id="resetBtn">⏮ 先頭へ</button>
+  <div id="timeDisp">0:00.00</div>
+  <span style="font-size:12px;color:#9fb4cc;">速度:</span>
+  <button class="speedBtn" data-speed="0.5">0.5x</button>
+  <button class="speedBtn active" data-speed="1">1x</button>
+  <button class="speedBtn" data-speed="2">2x</button>
+  <div id="seekWrap">
+    <input type="range" id="seek" min="0" max="1000" value="0">
+    <span id="totalDisp" style="font-size:12px;color:#9fb4cc;">/ 0:00.00</span>
+  </div>
+  <div id="raceInfo"></div>
+</div>
+
+<div id="canvasWrap">
+  <canvas id="cv"></canvas>
+  <div id="dropHint">JSONファイルをドロップして読み込み</div>
+</div>
+<div id="err"></div>
+
+<script>
+"use strict";
+
+/* ============================================================
+ * 同梱サンプルデータ
+ * 外部JSON（同じ構造）を fileInput / ドラッグ＆ドロップで読み込むと
+ * こちらは使われず、読み込んだデータで再生されます。
+ * 構造: { distance: m, horses: [ { id, name, laps:[{point,time},...] } ] }
+ * ============================================================ */
+const SAMPLE_DATA = {
+  "distance": 2000,
+  "horses": [
+    {
+      "id": 1,
+      "name": "サンダーボルト",
+      "laps": [
+        {
+          "point": 200,
+          "time": 12.49
+        },
+        {
+          "point": 400,
+          "time": 24.25
+        },
+        {
+          "point": 600,
+          "time": 36.36
+        },
+        {
+          "point": 800,
+          "time": 48.54
+        },
+        {
+          "point": 1000,
+          "time": 60.92
+        },
+        {
+          "point": 1200,
+          "time": 72.99
+        },
+        {
+          "point": 1400,
+          "time": 85.33
+        },
+        {
+          "point": 1600,
+          "time": 97.56
+        },
+        {
+          "point": 1800,
+          "time": 109.98
+        },
+        {
+          "point": 2000,
+          "time": 122.64
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "ミッドナイトスター",
+      "laps": [
+        {
+          "point": 200,
+          "time": 12.45
+        },
+        {
+          "point": 400,
+          "time": 24.11
+        },
+        {
+          "point": 600,
+          "time": 35.66
+        },
+        {
+          "point": 800,
+          "time": 47.46
+        },
+        {
+          "point": 1000,
+          "time": 59.43
+        },
+        {
+          "point": 1200,
+          "time": 71.06
+        },
+        {
+          "point": 1400,
+          "time": 83.15
+        },
+        {
+          "point": 1600,
+          "time": 95.25
+        },
+        {
+          "point": 1800,
+          "time": 107.23
+        },
+        {
+          "point": 2000,
+          "time": 119.17
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "ハヤテノゴトク",
+      "laps": [
+        {
+          "point": 200,
+          "time": 12.84
+        },
+        {
+          "point": 400,
+          "time": 24.91
+        },
+        {
+          "point": 600,
+          "time": 37.4
+        },
+        {
+          "point": 800,
+          "time": 49.79
+        },
+        {
+          "point": 1000,
+          "time": 62.32
+        },
+        {
+          "point": 1200,
+          "time": 74.84
+        },
+        {
+          "point": 1400,
+          "time": 87.3
+        },
+        {
+          "point": 1600,
+          "time": 100.01
+        },
+        {
+          "point": 1800,
+          "time": 112.45
+        },
+        {
+          "point": 2000,
+          "time": 125.02
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "サクラエンプレス",
+      "laps": [
+        {
+          "point": 200,
+          "time": 13.37
+        },
+        {
+          "point": 400,
+          "time": 25.78
+        },
+        {
+          "point": 600,
+          "time": 38.23
+        },
+        {
+          "point": 800,
+          "time": 50.32
+        },
+        {
+          "point": 1000,
+          "time": 62.48
+        },
+        {
+          "point": 1200,
+          "time": 74.65
+        },
+        {
+          "point": 1400,
+          "time": 86.69
+        },
+        {
+          "point": 1600,
+          "time": 98.79
+        },
+        {
+          "point": 1800,
+          "time": 110.79
+        },
+        {
+          "point": 2000,
+          "time": 122.86
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "ゴールドラッシュ",
+      "laps": [
+        {
+          "point": 200,
+          "time": 12.81
+        },
+        {
+          "point": 400,
+          "time": 24.76
+        },
+        {
+          "point": 600,
+          "time": 36.77
+        },
+        {
+          "point": 800,
+          "time": 49.15
+        },
+        {
+          "point": 1000,
+          "time": 61.4
+        },
+        {
+          "point": 1200,
+          "time": 73.67
+        },
+        {
+          "point": 1400,
+          "time": 85.74
+        },
+        {
+          "point": 1600,
+          "time": 98.11
+        },
+        {
+          "point": 1800,
+          "time": 110.23
+        },
+        {
+          "point": 2000,
+          "time": 122.49
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "シルバーウィンド",
+      "laps": [
+        {
+          "point": 200,
+          "time": 13.33
+        },
+        {
+          "point": 400,
+          "time": 25.9
+        },
+        {
+          "point": 600,
+          "time": 38.53
+        },
+        {
+          "point": 800,
+          "time": 51.09
+        },
+        {
+          "point": 1000,
+          "time": 63.34
+        },
+        {
+          "point": 1200,
+          "time": 75.48
+        },
+        {
+          "point": 1400,
+          "time": 87.72
+        },
+        {
+          "point": 1600,
+          "time": 99.91
+        },
+        {
+          "point": 1800,
+          "time": 112.05
+        },
+        {
+          "point": 2000,
+          "time": 124.53
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "アカツキオー",
+      "laps": [
+        {
+          "point": 200,
+          "time": 13.06
+        },
+        {
+          "point": 400,
+          "time": 25.22
+        },
+        {
+          "point": 600,
+          "time": 37.68
+        },
+        {
+          "point": 800,
+          "time": 49.94
+        },
+        {
+          "point": 1000,
+          "time": 62.15
+        },
+        {
+          "point": 1200,
+          "time": 74.39
+        },
+        {
+          "point": 1400,
+          "time": 86.82
+        },
+        {
+          "point": 1600,
+          "time": 99.14
+        },
+        {
+          "point": 1800,
+          "time": 111.65
+        },
+        {
+          "point": 2000,
+          "time": 124.36
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "ホシノキセキ",
+      "laps": [
+        {
+          "point": 200,
+          "time": 12.86
+        },
+        {
+          "point": 400,
+          "time": 24.74
+        },
+        {
+          "point": 600,
+          "time": 36.46
+        },
+        {
+          "point": 800,
+          "time": 48.22
+        },
+        {
+          "point": 1000,
+          "time": 60.06
+        },
+        {
+          "point": 1200,
+          "time": 72.22
+        },
+        {
+          "point": 1400,
+          "time": 84.52
+        },
+        {
+          "point": 1600,
+          "time": 96.69
+        },
+        {
+          "point": 1800,
+          "time": 108.74
+        },
+        {
+          "point": 2000,
+          "time": 121.0
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "name": "ブレイブハート",
+      "laps": [
+        {
+          "point": 200,
+          "time": 13.46
+        },
+        {
+          "point": 400,
+          "time": 26.05
+        },
+        {
+          "point": 600,
+          "time": 38.22
+        },
+        {
+          "point": 800,
+          "time": 50.73
+        },
+        {
+          "point": 1000,
+          "time": 63.22
+        },
+        {
+          "point": 1200,
+          "time": 75.63
+        },
+        {
+          "point": 1400,
+          "time": 87.9
+        },
+        {
+          "point": 1600,
+          "time": 100.35
+        },
+        {
+          "point": 1800,
+          "time": 112.53
+        },
+        {
+          "point": 2000,
+          "time": 124.87
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "name": "ラストスパート",
+      "laps": [
+        {
+          "point": 200,
+          "time": 13.42
+        },
+        {
+          "point": 400,
+          "time": 25.65
+        },
+        {
+          "point": 600,
+          "time": 37.9
+        },
+        {
+          "point": 800,
+          "time": 49.91
+        },
+        {
+          "point": 1000,
+          "time": 62.18
+        },
+        {
+          "point": 1200,
+          "time": 74.35
+        },
+        {
+          "point": 1400,
+          "time": 86.14
+        },
+        {
+          "point": 1600,
+          "time": 98.01
+        },
+        {
+          "point": 1800,
+          "time": 109.77
+        },
+        {
+          "point": 2000,
+          "time": 121.22
+        }
+      ]
+    }
+  ]
+};
+
+/* ---------------- データ管理 ---------------- */
+let race = null;   // 検証・前処理済みレースデータ
+let curTime = 0;   // 現在の経過秒
+let playing = false;
+let speed = 1;
+let lastTs = null;
+
+const LANE_COLORS = [
+  "#ffffff", "#222222", "#e04040", "#4060e0", "#e0d040",
+  "#40b050", "#e08030", "#e070b0", "#9050c0", "#50c0c0"
+];
+// 枠色に対する文字色（視認性確保）
+const LANE_TEXT = [
+  "#222", "#fff", "#fff", "#fff", "#222",
+  "#fff", "#fff", "#fff", "#fff", "#222"
+];
+
+function validateAndPrepare(json) {
+  if (typeof json !== "object" || json === null) throw new Error("JSONのルートがオブジェクトではありません");
+  const d = Number(json.distance);
+  if (!Number.isFinite(d) || d < 1000 || d > 3600) throw new Error("distance は 1000〜3600 (m) で指定してください: " + json.distance);
+  if (!Array.isArray(json.horses) || json.horses.length === 0) throw new Error("horses 配列がありません");
+
+  const horses = json.horses.map((h, idx) => {
+    if (!Array.isArray(h.laps) || h.laps.length === 0) throw new Error(`馬 ${h.name || idx + 1} に laps がありません`);
+    // (0m, 0s) を先頭に補い、point昇順で通過点リストを作る
+    const pts = [{ point: 0, time: 0 }];
+    for (const lap of h.laps) {
+      const p = Number(lap.point), t = Number(lap.time);
+      if (!Number.isFinite(p) || !Number.isFinite(t)) throw new Error(`馬 ${h.name || idx + 1} の laps に不正な値があります`);
+      pts.push({ point: p, time: t });
+    }
+    pts.sort((a, b) => a.point - b.point);
+    const last = pts[pts.length - 1];
+    if (last.point < d) {
+      // 最終ラップがゴール手前までしか無い場合は等速外挿でゴール時刻を補完
+      const prev = pts.length >= 2 ? pts[pts.length - 2] : { point: 0, time: 0 };
+      const v = (last.point - prev.point) / Math.max(last.time - prev.time, 0.01);
+      pts.push({ point: d, time: last.time + (d - last.point) / Math.max(v, 0.01) });
+    }
+    return {
+      id: h.id != null ? h.id : idx + 1,
+      name: String(h.name != null ? h.name : "馬" + (idx + 1)),
+      pts,
+      goalTime: pts[pts.length - 1].time
+    };
+  });
+
+  const totalTime = Math.max(...horses.map(h => h.goalTime));
+  return { distance: d, horses, totalTime };
+}
+
+/* 時刻 t における馬の位置(m)を通過点間の線形補間で求める */
+function positionAt(horse, t) {
+  const pts = horse.pts;
+  if (t <= 0) return 0;
+  if (t >= horse.goalTime) return race.distance;
+  // 二分探索: time <= t を満たす最大のインデックス
+  let lo = 0, hi = pts.length - 1;
+  while (lo < hi) {
+    const mid = (lo + hi + 1) >> 1;
+    if (pts[mid].time <= t) lo = mid; else hi = mid - 1;
+  }
+  const a = pts[lo], b = pts[Math.min(lo + 1, pts.length - 1)];
+  if (b.time <= a.time) return a.point;
+  const r = (t - a.time) / (b.time - a.time);
+  return a.point + (b.point - a.point) * r;
+}
+
+/* ---------------- 描画 ---------------- */
+const cv = document.getElementById("cv");
+const ctx = cv.getContext("2d");
+const N_LANES = 10; // 常に10頭(10レーン)表示
+const LANE_H = 46;
+const TRACK_TOP = 64;
+const CANVAS_H = TRACK_TOP + LANE_H * N_LANES + 40;
+
+function resizeCanvas() {
+  const w = cv.clientWidth || cv.parentElement.clientWidth;
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = Math.round(w * dpr);
+  cv.height = Math.round(CANVAS_H * dpr);
+  cv.style.height = CANVAS_H + "px";
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+window.addEventListener("resize", () => { resizeCanvas(); draw(); });
+
+function fmtTime(sec) {
+  const m = Math.floor(sec / 60);
+  const s = sec - m * 60;
+  return m + ":" + (s < 10 ? "0" : "") + s.toFixed(2);
+}
+
+function draw() {
+  const W = cv.clientWidth;
+  ctx.clearRect(0, 0, W, CANVAS_H);
+  if (!race) return;
+
+  // --- 現在位置を計算 ---
+  const poss = race.horses.map(h => positionAt(h, curTime));
+  const minP = Math.min(...poss), maxP = Math.max(...poss);
+
+  // --- カメラ: 全馬が収まる範囲を表示（横スクロール追従） ---
+  const VIEW_MIN_M = 400;                        // 最低でも400m幅を表示
+  const spread = Math.max(maxP - minP + 120, VIEW_MIN_M);
+  const center = (minP + maxP) / 2;
+  let viewL = center - spread / 2;
+  let viewR = center + spread / 2;
+  // コース外へはみ出しすぎない範囲でクランプ
+  if (viewL < -60) { viewR += (-60 - viewL); viewL = -60; }
+  if (viewR > race.distance + 100) { viewL -= (viewR - race.distance - 100); viewR = race.distance + 100; }
+  const ppm = W / (viewR - viewL); // pixel per meter
+  const xOf = m => (m - viewL) * ppm;
+
+  // --- 芝生の背景・レーン ---
+  ctx.fillStyle = "#2e7d4f";
+  ctx.fillRect(0, 0, W, CANVAS_H);
+  for (let i = 0; i < N_LANES; i++) {
+    const y = TRACK_TOP + i * LANE_H;
+    ctx.fillStyle = i % 2 === 0 ? "#2f8152" : "#2a744a";
+    ctx.fillRect(0, y, W, LANE_H);
+    ctx.strokeStyle = "rgba(255,255,255,0.15)";
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+
+  // --- 200mごとのハロン棒(距離マーカー) ---
+  ctx.textAlign = "center";
+  for (let m = 0; m <= race.distance; m += 200) {
+    const x = xOf(m);
+    if (x < -50 || x > W + 50) continue;
+    ctx.strokeStyle = "rgba(255,255,255,0.35)";
+    ctx.setLineDash([6, 6]);
+    ctx.beginPath(); ctx.moveTo(x, TRACK_TOP); ctx.lineTo(x, TRACK_TOP + LANE_H * N_LANES); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = "#d8f0dc";
+    ctx.font = "12px sans-serif";
+    ctx.fillText(m + "m", x, TRACK_TOP - 24);
+    const rem = race.distance - m;
+    ctx.fillStyle = "rgba(216,240,220,0.75)";
+    ctx.font = "11px sans-serif";
+    ctx.fillText(rem === 0 ? "GOAL" : "残り" + rem + "m", x, TRACK_TOP - 10);
+  }
+
+  // --- スタート/ゴールライン ---
+  const drawLine = (m, color, label) => {
+    const x = xOf(m);
+    if (x < -60 || x > W + 60) return;
+    ctx.strokeStyle = color; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.moveTo(x, TRACK_TOP); ctx.lineTo(x, TRACK_TOP + LANE_H * N_LANES); ctx.stroke();
+    ctx.lineWidth = 1;
+    ctx.fillStyle = color; ctx.font = "bold 13px sans-serif";
+    ctx.fillText(label, x, TRACK_TOP + LANE_H * N_LANES + 18);
+  };
+  drawLine(0, "#ffffff", "START");
+  drawLine(race.distance, "#ffd040", "GOAL");
+
+  // --- 着順(現在位置順位)を計算 ---
+  const order = poss.map((p, i) => [p, i]).sort((a, b) =>
+    (b[0] - a[0]) || (race.horses[a[1]].goalTime - race.horses[b[1]].goalTime));
+  const rankOf = new Array(poss.length);
+  order.forEach(([, i], r) => { rankOf[i] = r + 1; });
+
+  // --- 馬を描画 ---
+  for (let i = 0; i < race.horses.length && i < N_LANES; i++) {
+    const h = race.horses[i];
+    const x = xOf(poss[i]);
+    const y = TRACK_TOP + i * LANE_H + LANE_H / 2;
+    const R = 13;
+    const ci = (h.id - 1) % LANE_COLORS.length;
+
+    // 馬体（円）
+    ctx.beginPath();
+    ctx.arc(x, y, R, 0, Math.PI * 2);
+    ctx.fillStyle = LANE_COLORS[ci];
+    ctx.fill();
+    ctx.strokeStyle = "rgba(0,0,0,0.5)";
+    ctx.stroke();
+    // 馬番
+    ctx.fillStyle = LANE_TEXT[ci];
+    ctx.font = "bold 13px sans-serif";
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText(String(h.id), x, y + 0.5);
+
+    // 名前ラベル（馬の後方に表示）
+    const label = h.name + "（" + rankOf[i] + "位）";
+    ctx.font = "12px sans-serif";
+    const tw = ctx.measureText(label).width;
+    let lx = x - R - 8 - tw / 2;
+    if (lx - tw / 2 < 2) lx = x + R + 8 + tw / 2; // 左端では右側へ
+    ctx.fillStyle = "rgba(0,0,0,0.45)";
+    ctx.fillRect(lx - tw / 2 - 4, y - 9, tw + 8, 18);
+    ctx.fillStyle = "#fff";
+    ctx.fillText(label, lx, y + 0.5);
+
+    // ゴール済みならタイム表示
+    if (curTime >= h.goalTime) {
+      ctx.fillStyle = "#ffd76e";
+      ctx.font = "11px monospace";
+      ctx.fillText(fmtTime(h.goalTime), x, y - R - 8);
+    }
+  }
+  ctx.textBaseline = "alphabetic";
+
+  // --- 上部情報 ---
+  ctx.textAlign = "left";
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "bold 14px sans-serif";
+  const leadIdx = order[0][1];
+  ctx.fillText(
+    "先頭: " + race.horses[leadIdx].name + "  " +
+    Math.min(Math.round(maxP), race.distance) + "m地点 / 残り" +
+    Math.max(race.distance - Math.round(maxP), 0) + "m",
+    10, 20);
+}
+
+/* ---------------- 再生制御 ---------------- */
+const playBtn = document.getElementById("playBtn");
+const resetBtn = document.getElementById("resetBtn");
+const timeDisp = document.getElementById("timeDisp");
+const totalDisp = document.getElementById("totalDisp");
+const seek = document.getElementById("seek");
+const raceInfo = document.getElementById("raceInfo");
+const errBox = document.getElementById("err");
+let seeking = false;
+
+function setPlaying(p) {
+  playing = p && race != null;
+  playBtn.textContent = playing ? "⏸ 一時停止" : "▶ 再生";
+  lastTs = null;
+}
+playBtn.addEventListener("click", () => {
+  if (!playing && race && curTime >= race.totalTime) curTime = 0; // ゴール後は先頭から
+  setPlaying(!playing);
+});
+resetBtn.addEventListener("click", () => { curTime = 0; syncUI(); draw(); });
+
+document.querySelectorAll(".speedBtn").forEach(b => {
+  b.addEventListener("click", () => {
+    speed = Number(b.dataset.speed);
+    document.querySelectorAll(".speedBtn").forEach(x => x.classList.toggle("active", x === b));
+  });
+});
+
+seek.addEventListener("input", () => {
+  if (!race) return;
+  seeking = true;
+  curTime = (seek.value / 1000) * race.totalTime;
+  timeDisp.textContent = fmtTime(curTime);
+  draw();
+});
+seek.addEventListener("change", () => { seeking = false; });
+
+// スペースキーで再生/停止
+document.addEventListener("keydown", e => {
+  if (e.code === "Space" && e.target.tagName !== "INPUT") {
+    e.preventDefault();
+    playBtn.click();
+  }
+});
+
+function syncUI() {
+  timeDisp.textContent = fmtTime(curTime);
+  if (race && !seeking) seek.value = Math.round((curTime / race.totalTime) * 1000);
+}
+
+function frame(ts) {
+  if (playing && race) {
+    if (lastTs != null) {
+      curTime += ((ts - lastTs) / 1000) * speed;
+      if (curTime >= race.totalTime) {
+        curTime = race.totalTime;
+        setPlaying(false);
+      }
+      syncUI();
+      draw();
+    }
+    lastTs = ts;
+  }
+  requestAnimationFrame(frame);
+}
+
+/* ---------------- データ読み込み ---------------- */
+function loadRace(json, sourceName) {
+  try {
+    race = validateAndPrepare(json);
+    curTime = 0;
+    setPlaying(false);
+    totalDisp.textContent = "/ " + fmtTime(race.totalTime);
+    raceInfo.textContent = sourceName + "｜距離 " + race.distance + "m｜" + race.horses.length + "頭";
+    errBox.textContent = "";
+    syncUI();
+    draw();
+  } catch (e) {
+    errBox.textContent = "データ読み込みエラー: " + e.message;
+  }
+}
+
+document.getElementById("fileInput").addEventListener("change", ev => {
+  const f = ev.target.files[0];
+  if (f) readJsonFile(f);
+});
+
+function readJsonFile(f) {
+  const r = new FileReader();
+  r.onload = () => {
+    try { loadRace(JSON.parse(r.result), f.name); }
+    catch (e) { errBox.textContent = "JSONの解析に失敗しました: " + e.message; }
+  };
+  r.readAsText(f, "utf-8");
+}
+
+// ドラッグ＆ドロップ読み込み
+const dropHint = document.getElementById("dropHint");
+document.addEventListener("dragover", e => { e.preventDefault(); dropHint.style.display = "flex"; });
+document.addEventListener("dragleave", e => { if (e.relatedTarget === null) dropHint.style.display = "none"; });
+document.addEventListener("drop", e => {
+  e.preventDefault();
+  dropHint.style.display = "none";
+  const f = e.dataTransfer.files[0];
+  if (f) readJsonFile(f);
+});
+
+/* ---------------- 初期化 ---------------- */
+resizeCanvas();
+loadRace(SAMPLE_DATA, "同梱サンプルデータ (sample_race.json)");
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
